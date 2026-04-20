@@ -1,0 +1,71 @@
+-- Agile Project Management Tool - Database Schema
+CREATE TABLE IF NOT EXISTS Projects (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name TEXT NOT NULL,
+    Description TEXT
+);
+CREATE TABLE IF NOT EXISTS Persons (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name TEXT NOT NULL,
+    Role TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS ProjectPersons (
+    ProjectId INTEGER NOT NULL,
+    PersonId INTEGER NOT NULL,
+    PRIMARY KEY (ProjectId, PersonId),
+    FOREIGN KEY (ProjectId) REFERENCES Projects(Id) ON DELETE CASCADE,
+    FOREIGN KEY (PersonId) REFERENCES Persons(Id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS Teams (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name TEXT NOT NULL,
+    ProjectId INTEGER NOT NULL,
+    FOREIGN KEY (ProjectId) REFERENCES Projects(Id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS TeamPersons (
+    TeamId INTEGER NOT NULL,
+    PersonId INTEGER NOT NULL,
+    PRIMARY KEY (TeamId, PersonId),
+    FOREIGN KEY (TeamId) REFERENCES Teams(Id) ON DELETE CASCADE,
+    FOREIGN KEY (PersonId) REFERENCES Persons(Id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS UserStories (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ProjectId INTEGER NOT NULL,
+    Title TEXT NOT NULL,
+    Content TEXT,
+    State TEXT NOT NULL DEFAULT 'ProjectBacklog', -- ProjectBacklog, InSprint, Done
+    Priority INTEGER DEFAULT 0,
+    FOREIGN KEY (ProjectId) REFERENCES Projects(Id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS UserStoryDependencies (
+    UserStoryId INTEGER NOT NULL,
+    DependsOnId INTEGER NOT NULL,
+    PRIMARY KEY (UserStoryId, DependsOnId),
+    FOREIGN KEY (UserStoryId) REFERENCES UserStories(Id) ON DELETE CASCADE,
+    FOREIGN KEY (DependsOnId) REFERENCES UserStories(Id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS Tasks (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserStoryId INTEGER NOT NULL,
+    Title TEXT NOT NULL,
+    Description TEXT,
+    State TEXT NOT NULL DEFAULT 'ToBeDone', -- ToBeDone, InProcess, Done
+    Priority INTEGER DEFAULT 0,
+    PlannedTime REAL DEFAULT 0,
+    ActualTime REAL DEFAULT 0,
+    PlannedStartDate TEXT,
+    PlannedEndDate TEXT,
+    ActualStartDate TEXT,
+    ActualEndDate TEXT,
+    Difficulty INTEGER DEFAULT 0,
+    CategoryLabels TEXT,
+    FOREIGN KEY (UserStoryId) REFERENCES UserStories(Id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS TaskPersons (
+    TaskId INTEGER NOT NULL,
+    PersonId INTEGER NOT NULL,
+    PRIMARY KEY (TaskId, PersonId),
+    FOREIGN KEY (TaskId) REFERENCES Tasks(Id) ON DELETE CASCADE,
+    FOREIGN KEY (PersonId) REFERENCES Persons(Id) ON DELETE CASCADE
+);
