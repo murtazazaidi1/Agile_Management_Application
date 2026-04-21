@@ -8,6 +8,7 @@ namespace ScrumTool
     {
         static void Main(string[] args)
         {
+            // these are just practice dbs
             //SqliteDatabase database = new SqliteDatabase("scrum.db");
             //SqliteDatabase database = new SqliteDatabase("agile.db");
             SqliteDatabase database = new SqliteDatabase("groupOK.db");

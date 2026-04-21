@@ -16,10 +16,13 @@ namespace ScrumTool.View
         }
 
         public void Run()
+
         {
-            Console.WriteLine("========================================");
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.WriteLine("⋆⁺｡˚⋆˙‧₊✩₊‧˙⋆˚｡⁺⋆ ⋆⁺｡˚⋆˙‧₊✩₊‧˙⋆˚｡⁺⋆");
             Console.WriteLine("Agile Project Management Tool - Group OK");
-            Console.WriteLine("========================================");
+            
+            Console.WriteLine("⠀⠀⢀⣀⡀⠘⢀⣀⠀⣀⠀⠀⠀⠀⣠⡀\r\n⠠⡪⠁⠄⢀⠟⠁⠀⠀⠀⠈⠢⠀⠀⠙⠁\r\n⠀⠑⠄⡑⢌⡀⠀⠀⠀⠀⠀⠀⡗⠠⡀⠀\r\n⠀⠀⠀⠈⠒⡬⢐⠢⠄⣀⠀⢠⠃⠱⡈⠢\r\n⠀⠀⠀⠀⠀⠈⠒⠨⠥⠶⠆⠩⠭⠥⠤⠐\r\n⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⡧⠀⠀⠀⠀");
 
             bool running = true;
             while (running)
@@ -47,7 +50,7 @@ namespace ScrumTool.View
                     default: Print("Invalid option."); break;
                 }
             }
-            Console.WriteLine("Goodbye!");
+            Console.WriteLine(".𖥔 ݁ ˖ִ ࣪⚝₊ ⊹˚. ݁₊Goodbye! ⊹ . ݁˖ . ݁.𖥔 ݁ ˖");
         }
 
         private void ShowMainMenu()
@@ -56,14 +59,14 @@ namespace ScrumTool.View
                 ? $"[Project: {_ctrl.GetProject(_currentProjectId.Value)?.Name}]"    // Ai
                 : "[No project selected]";
             Console.WriteLine();
-            Console.WriteLine($"==== Main Menu {proj} ====");
-            Console.WriteLine("1. Projects");
-            Console.WriteLine("2. Persons");
-            Console.WriteLine("3. User Stories (requires project)");
-            Console.WriteLine("4. Tasks (requires project)");
-            Console.WriteLine("5. Reports");
-            Console.WriteLine("6. Teams (requires project)");
-            Console.WriteLine("Q. Quit");
+            Console.WriteLine($"⊹₊ ⋆ᯓ★ Main Menu {proj} ᯓ★⋆ ⊹₊");
+            Console.WriteLine("1. ✧ Projects");
+            Console.WriteLine("2. ✧ Persons");
+            Console.WriteLine("3. ✧ User Stories (requires project)");
+            Console.WriteLine("4. ✧ Tasks (requires project)");
+            Console.WriteLine("5. ✧ Reports");
+            Console.WriteLine("6. ✧ Teams (requires project)");
+            Console.WriteLine("Q. ✧ Quit");
             Console.Write("> ");
         }
 
@@ -72,15 +75,15 @@ namespace ScrumTool.View
             bool back = false;
             while (!back)
             {
-                Console.WriteLine("\n--- Projects ---");
-                Console.WriteLine("1. List projects");
-                Console.WriteLine("2. Create project");
-                Console.WriteLine("3. Edit project");
-                Console.WriteLine("4. Delete project");
-                Console.WriteLine("5. Select active project");
-                Console.WriteLine("6. Link person to project");
-                Console.WriteLine("7. Unlink person from project");
-                Console.WriteLine("B. Back");
+                Console.WriteLine("\n⋆⁺｡˚⋆˙‧₊☾ Projects ☽₊‧˙⋆˚｡⁺⋆ ");
+                Console.WriteLine("1. ✧ List projects");
+                Console.WriteLine("2. ✧ Create project");
+                Console.WriteLine("3. ✧ Edit project");
+                Console.WriteLine("4. ✧ Delete project");
+                Console.WriteLine("5. ✧ Select active project");
+                Console.WriteLine("6. ✧ Link person to project");
+                Console.WriteLine("7. ✧ Unlink person from project");
+                Console.WriteLine("B. ✧ Back");
                 Console.Write("> ");
 
                 switch (Console.ReadLine()?.Trim().ToLower())
@@ -143,13 +146,13 @@ namespace ScrumTool.View
             bool back = false;
             while (!back)
             {
-                Console.WriteLine("\n--- Persons ---");
-                Console.WriteLine("1. List all persons");
-                Console.WriteLine("2. Add person");
-                Console.WriteLine("3. Edit person");
-                Console.WriteLine("4. Delete person");
-                Console.WriteLine("5. List persons in current project");
-                Console.WriteLine("B. Back");
+                Console.WriteLine("\n⋆⁺｡˚⋆˙‧₊☾ Persons ☽₊‧˙⋆˚｡⁺⋆");
+                Console.WriteLine("1. ✧ List all persons");
+                Console.WriteLine("2. ✧ Add person");
+                Console.WriteLine("3. ✧ Edit person");
+                Console.WriteLine("4. ✧ Delete person");
+                Console.WriteLine("5. ✧ List persons in current project");
+                Console.WriteLine("B. ✧ Back");
                 Console.Write("> ");
 
                 switch (Console.ReadLine()?.Trim().ToLower())
@@ -200,15 +203,15 @@ namespace ScrumTool.View
             bool back = false;
             while (!back)
             {
-                Console.WriteLine("\n--- User Stories ---");
-                Console.WriteLine("1. List stories");
-                Console.WriteLine("2. Add story");
-                Console.WriteLine("3. Edit story");
-                Console.WriteLine("4. Delete story");
-                Console.WriteLine("5. Move story state");
-                Console.WriteLine("6. Add dependency");
-                Console.WriteLine("7. Remove dependency");
-                Console.WriteLine("B. Back");
+                Console.WriteLine("\n⋆⁺｡˚⋆˙‧₊☾ USer Stories ☽₊‧˙⋆˚｡⁺⋆");
+                Console.WriteLine("1. ✧ List stories");
+                Console.WriteLine("2. ✧ Add story");
+                Console.WriteLine("3. ✧ Edit story");
+                Console.WriteLine("4. ✧ Delete story");
+                Console.WriteLine("5. ✧ Move story state");
+                Console.WriteLine("6. ✧ Add dependency");
+                Console.WriteLine("7. ✧ Remove dependency");
+                Console.WriteLine("B. ✧ Back");
                 Console.Write("> ");
 
                 switch (Console.ReadLine()?.Trim().ToLower())
@@ -277,16 +280,16 @@ namespace ScrumTool.View
             bool back = false;
             while (!back)
             {
-                Console.WriteLine("\n--- Tasks ---");
-                Console.WriteLine("1. List tasks for a story");
-                Console.WriteLine("2. Add task");
-                Console.WriteLine("3. Edit task");
-                Console.WriteLine("4. Delete task");
-                Console.WriteLine("5. Move task state");
-                Console.WriteLine("6. Assign person");
-                Console.WriteLine("7. Remove person");
-                Console.WriteLine("8. Change priority");
-                Console.WriteLine("B. Back");
+                Console.WriteLine("\n⋆⁺｡˚⋆˙‧₊☾ Tasks ☽₊‧˙⋆˚｡⁺⋆");
+                Console.WriteLine("1. ✧ List tasks for a story");
+                Console.WriteLine("2. ✧ Add task");
+                Console.WriteLine("3. ✧ Edit task");
+                Console.WriteLine("4. ✧ Delete task");
+                Console.WriteLine("5. ✧ Move task state");
+                Console.WriteLine("6. ✧ Assign person");
+                Console.WriteLine("7. ✧ Remove person");
+                Console.WriteLine("8. ✧ Change priority");
+                Console.WriteLine("B. ✧ Back");
                 Console.Write("> ");
 
                 switch (Console.ReadLine()?.Trim().ToLower())
@@ -381,15 +384,15 @@ namespace ScrumTool.View
             bool back = false;
             while (!back)
             {
-                Console.WriteLine("\n--- Teams ---");
-                Console.WriteLine("1. List teams");
-                Console.WriteLine("2. Create team");
-                Console.WriteLine("3. Edit team");
-                Console.WriteLine("4. Delete team");
-                Console.WriteLine("5. Add person to team");
-                Console.WriteLine("6. Remove person from team");
-                Console.WriteLine("7. List persons in team");
-                Console.WriteLine("B. Back");
+                Console.WriteLine("\n⋆⁺｡˚⋆˙‧₊☾ Teams ☽₊‧˙⋆˚｡⁺⋆");
+                Console.WriteLine("1. ✧ List teams");
+                Console.WriteLine("2. ✧ Create team");
+                Console.WriteLine("3. ✧ Edit team");
+                Console.WriteLine("4. ✧ Delete team");
+                Console.WriteLine("5. ✧ Add person to team");
+                Console.WriteLine("6. ✧ Remove person from team");
+                Console.WriteLine("7. ✧ List persons in team");
+                Console.WriteLine("B. ✧ Back");
                 Console.Write("> ");
 
                 switch (Console.ReadLine()?.Trim().ToLower())
@@ -452,13 +455,13 @@ namespace ScrumTool.View
             bool back = false;
             while (!back)
             {
-                Console.WriteLine("\n--- Reports ---");
-                Console.WriteLine("1. Project report");
-                Console.WriteLine("2. Sprint report");
-                Console.WriteLine("3. User story report");
-                Console.WriteLine("4. Task report");
-                Console.WriteLine("5. Person report");
-                Console.WriteLine("B. Back");
+                Console.WriteLine("\n⋆⁺｡˚⋆˙‧₊☾ Reports ☽₊‧˙⋆˚｡⁺⋆");
+                Console.WriteLine("1. ✧ Project report");
+                Console.WriteLine("2. ✧ Sprint report");
+                Console.WriteLine("3. ✧ User story report");
+                Console.WriteLine("4. ✧ Task report");
+                Console.WriteLine("5. ✧ Person report");
+                Console.WriteLine("B. ✧ FBack");
                 Console.Write("> ");
 
                 switch (Console.ReadLine()?.Trim().ToLower())
