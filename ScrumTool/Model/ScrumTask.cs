@@ -104,7 +104,7 @@ namespace ScrumTool.Model
 
         public override string ToString()
         {
-            return $"[{Id}] {Title} ({State})";
+            return $"[{Id}] {Title} ({State})"; // just for printing the id, title and state of task
         }
     }
 }
