@@ -16,19 +16,19 @@ namespace ScrumTool.View
         }
 
         public void Run()
-
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             Console.WriteLine("⋆⁺｡˚⋆˙‧₊✩₊‧˙⋆˚｡⁺⋆ ⋆⁺｡˚⋆˙‧₊✩₊‧˙⋆˚｡⁺⋆");
             Console.WriteLine("Agile Project Management Tool - Group OK");
-            
+
             Console.WriteLine("⠀⠀⢀⣀⡀⠘⢀⣀⠀⣀⠀⠀⠀⠀⣠⡀\r\n⠠⡪⠁⠄⢀⠟⠁⠀⠀⠀⠈⠢⠀⠀⠙⠁\r\n⠀⠑⠄⡑⢌⡀⠀⠀⠀⠀⠀⠀⡗⠠⡀⠀\r\n⠀⠀⠀⠈⠒⡬⢐⠢⠄⣀⠀⢠⠃⠱⡈⠢\r\n⠀⠀⠀⠀⠀⠈⠒⠨⠥⠶⠆⠩⠭⠥⠤⠐\r\n⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⡧⠀⠀⠀⠀");
 
             bool running = true;
             while (running)
             {
                 ShowMainMenu();
-                string input = Console.ReadLine()?.Trim().ToLower();
+                var input = Console.ReadLine()?.Trim().ToLower();
+
                 switch (input)
                 {
                     case "1": ManageProjects(); break;
@@ -46,18 +46,24 @@ namespace ScrumTool.View
                         if (!EnsureProjectSelected()) break;
                         ManageTeams();
                         break;
-                    case "q": running = false; break;
-                    default: Print("Invalid option."); break;
+                    case "q":
+                        running = false;
+                        break;
+                    default:
+                        Print("Unknown option, try again.");
+                        break;
                 }
             }
-            Console.WriteLine(".𖥔 ݁ ˖ִ ࣪⚝₊ ⊹˚. ݁₊Goodbye! ⊹ . ݁˖ . ݁.𖥔 ݁ ˖");
+
+            Console.WriteLine("Bye!");
         }
 
         private void ShowMainMenu()
         {
             string proj = _currentProjectId.HasValue
-                ? $"[Project: {_ctrl.GetProject(_currentProjectId.Value)?.Name}]"    // Ai
-                : "[No project selected]";
+                ? $"(project: {_ctrl.GetProject(_currentProjectId.Value)?.Name})"
+                : "(no project selected)";
+
             Console.WriteLine();
             Console.WriteLine($"⊹₊ ⋆ᯓ★ Main Menu {proj} ᯓ★⋆ ⊹₊");
             Console.WriteLine("1. ✧ Projects");
@@ -92,41 +98,42 @@ namespace ScrumTool.View
                         var projs = _ctrl.ListProjects();
                         if (projs.Count == 0) { Print("No projects yet."); break; }
                         foreach (var p in projs)
-                            Console.WriteLine($"  {p} - {p.Description}");
+                            Console.WriteLine($"  [{p.Id}] {p.Name} — {p.Description}");
                         break;
 
                     case "2":
-                        string name = Prompt("Project name: ");
+                        string name = Prompt("Name: ");
                         string desc = Prompt("Description: ");
-                        var (ok, msg, id) = _ctrl.CreateProject(name, desc);
+                        var (ok, msg, newId) = _ctrl.CreateProject(name, desc);
                         Print(msg);
-                        if (ok) Print($"ID: {id}");
+                        if (ok) Print($"Created with ID {newId}");
                         break;
 
                     case "3":
-                        int eid = PromptInt("Project ID: ");
-                        string en = Prompt("New name: ");
-                        string ed = Prompt("New description: ");
-                        Print(_ctrl.EditProject(eid, en, ed).message);
+                        int projectId = PromptInt("Project ID: ");
+                        string newName = Prompt("New name: ");
+                        string newDesc = Prompt("New description: ");
+                        Print(_ctrl.EditProject(projectId, newName, newDesc).message);
                         break;
 
                     case "4":
-                        int did = PromptInt("Project ID to delete: ");
-                        Print(_ctrl.RemoveProject(did).message);
+                        // TODO: maybe ask for confirmation here someday
+                        int deleteId = PromptInt("Project ID: ");
+                        Print(_ctrl.RemoveProject(deleteId).message);
                         break;
 
                     case "5":
-                        int sid = PromptInt("Project ID: ");
-                        var sp = _ctrl.GetProject(sid);
-                        if (sp == null) { Print("Not found."); break; }
-                        _currentProjectId = sid;
-                        Print($"Active project set to: {sp.Name}");
+                        int activateId = PromptInt("Project ID: ");
+                        var project = _ctrl.GetProject(activateId);
+                        if (project == null) { Print("Couldn't find that project."); break; }
+                        _currentProjectId = activateId;
+                        Print($"Now working on: {project.Name}");
                         break;
 
                     case "6":
-                        int linkPersonId = PromptInt("Person ID: ");
+                        int personId = PromptInt("Person ID: ");
                         int linkProjectId = PromptInt("Project ID: ");
-                        Print(_ctrl.LinkPersonToProject(linkPersonId, linkProjectId).message);
+                        Print(_ctrl.LinkPersonToProject(personId, linkProjectId).message);
                         break;
 
                     case "7":
@@ -158,37 +165,37 @@ namespace ScrumTool.View
                 switch (Console.ReadLine()?.Trim().ToLower())
                 {
                     case "1":
-                        var persons = _ctrl.ListPersons();
-                        if (persons.Count == 0) { Print("No persons found."); break; }
-                        foreach (var p in persons)
+                        var all = _ctrl.ListPersons();
+                        if (all.Count == 0) { Print("No persons yet."); break; }
+                        foreach (var p in all)
                             Console.WriteLine($"  {p}");
                         break;
 
                     case "2":
-                        string n = Prompt("Name: ");
-                        string r = Prompt("Role: ");
-                        var (ok, msg, id) = _ctrl.CreatePerson(n, r);
+                        string personName = Prompt("Name: ");
+                        string role = Prompt("Role: ");
+                        var (ok, msg, newId) = _ctrl.CreatePerson(personName, role);
                         Print(msg);
-                        if (ok) Print($"ID: {id}");
+                        if (ok) Print($"ID: {newId}");
                         break;
 
                     case "3":
-                        int eid = PromptInt("Person ID: ");
-                        string en = Prompt("New name: ");
-                        string er = Prompt("New role: ");
-                        Print(_ctrl.EditPerson(eid, en, er).message);
+                        int editId = PromptInt("Person ID: ");
+                        string updatedName = Prompt("New name: ");
+                        string updatedRole = Prompt("New role: ");
+                        Print(_ctrl.EditPerson(editId, updatedName, updatedRole).message);
                         break;
 
                     case "4":
-                        int did = PromptInt("Person ID: ");
-                        Print(_ctrl.RemovePerson(did).message);
+                        int deleteId = PromptInt("Person ID: ");
+                        Print(_ctrl.RemovePerson(deleteId).message);
                         break;
 
                     case "5":
                         if (!EnsureProjectSelected()) break;
-                        var pp = _ctrl.GetPersonsForProject(_currentProjectId.Value);
-                        if (pp.Count == 0) { Print("Nobody linked to this project yet."); break; }
-                        foreach (var p in pp)
+                        var inProject = _ctrl.GetPersonsForProject(_currentProjectId.Value);
+                        if (inProject.Count == 0) { Print("Nobody linked to this project yet."); break; }
+                        foreach (var p in inProject)
                             Console.WriteLine($"  {p}");
                         break;
 
@@ -203,7 +210,7 @@ namespace ScrumTool.View
             bool back = false;
             while (!back)
             {
-                Console.WriteLine("\n⋆⁺｡˚⋆˙‧₊☾ USer Stories ☽₊‧˙⋆˚｡⁺⋆");
+                Console.WriteLine("\n⋆⁺｡˚⋆˙‧₊☾ User Stories ☽₊‧˙⋆˚｡⁺⋆");
                 Console.WriteLine("1. ✧ List stories");
                 Console.WriteLine("2. ✧ Add story");
                 Console.WriteLine("3. ✧ Edit story");
@@ -221,40 +228,42 @@ namespace ScrumTool.View
                         if (stories.Count == 0) { Print("No stories yet."); break; }
                         foreach (var s in stories)
                         {
-                            Console.WriteLine($"  {s}  priority={s.Priority}");
+                            Console.WriteLine($"  {s}  (priority: {s.Priority})");
                             if (s.DependsOnIds.Count > 0)
                                 Console.WriteLine($"    depends on: {string.Join(", ", s.DependsOnIds)}");
                         }
                         break;
 
                     case "2":
-                        string t = Prompt("Title: ");
-                        string c = Prompt("Content: ");
-                        int pr = PromptInt("Priority (0=low): ");
-                        var (ok, msg, id) = _ctrl.CreateUserStory(_currentProjectId.Value, t, c, pr);
+                        string title = Prompt("Title: ");
+                        string content = Prompt("Content: ");
+                        int priority = PromptInt("Priority (0 = lowest): ");
+                        var (ok, msg, newId) = _ctrl.CreateUserStory(_currentProjectId.Value, title, content, priority);
                         Print(msg);
-                        if (ok) Print($"ID: {id}");
+                        if (ok) Print($"Story ID: {newId}");
                         break;
 
                     case "3":
-                        int eid = PromptInt("Story ID: ");
-                        string et = Prompt("New title: ");
-                        string ec = Prompt("New content: ");
-                        int ep = PromptInt("New priority: ");
-                        Print(_ctrl.EditUserStory(eid, et, ec, ep).message);
+                        int storyId = PromptInt("Story ID: ");
+                        string newTitle = Prompt("New title: ");
+                        string newContent = Prompt("New content: ");
+                        int newPriority = PromptInt("New priority: ");
+                        Print(_ctrl.EditUserStory(storyId, newTitle, newContent, newPriority).message);
                         break;
 
                     case "4":
-                        int did = PromptInt("Story ID: ");
-                        Print(_ctrl.RemoveUserStory(did).message);
+                        int deleteId = PromptInt("Story ID: ");
+                        Print(_ctrl.RemoveUserStory(deleteId).message);
                         break;
 
                     case "5":
-                        int mid = PromptInt("Story ID: ");
-                        Console.WriteLine("1=ProjectBacklog  2=InSprint  3=Done");
-                        int stateNum = PromptInt("Target state: ");
-                        if (stateNum < 1 || stateNum > 3) { Print("Invalid state."); break; }
-                        Print(_ctrl.MoveUserStoryToState(mid, (UserStoryState)stateNum).message);
+                        int moveId = PromptInt("Story ID: ");
+                        Console.WriteLine("  1 = Project Backlog");
+                        Console.WriteLine("  2 = In Sprint");
+                        Console.WriteLine("  3 = Done");
+                        int stateChoice = PromptInt("State: ");
+                        if (stateChoice < 1 || stateChoice > 3) { Print("Invalid state."); break; }
+                        Print(_ctrl.MoveUserStoryToState(moveId, (UserStoryState)stateChoice).message);
                         break;
 
                     case "6":
@@ -264,9 +273,9 @@ namespace ScrumTool.View
                         break;
 
                     case "7":
-                        int rsid = PromptInt("Story ID: ");
-                        int rdepId = PromptInt("Remove dependency on story ID: ");
-                        Print(_ctrl.RemoveUserStoryDependency(rsid, rdepId).message);
+                        int removeSid = PromptInt("Story ID: ");
+                        int removeDepId = PromptInt("Remove dependency on story ID: ");
+                        Print(_ctrl.RemoveUserStoryDependency(removeSid, removeDepId).message);
                         break;
 
                     case "b": back = true; break;
@@ -295,9 +304,9 @@ namespace ScrumTool.View
                 switch (Console.ReadLine()?.Trim().ToLower())
                 {
                     case "1":
-                        int sid = PromptInt("User Story ID: ");
-                        var tasks = _ctrl.ListTasks(sid);
-                        if (tasks.Count == 0) { Print("No tasks."); break; }
+                        int storyId = PromptInt("User Story ID: ");
+                        var tasks = _ctrl.ListTasks(storyId);
+                        if (tasks.Count == 0) { Print("No tasks for that story."); break; }
                         foreach (var t in tasks)
                         {
                             Console.WriteLine($"  {t}  priority={t.Priority}  difficulty={t.Difficulty}");
@@ -309,68 +318,76 @@ namespace ScrumTool.View
 
                     case "2":
                         int usid = PromptInt("User Story ID: ");
-                        string tt = Prompt("Title: ");
-                        string td = Prompt("Description: ");
-                        int tp = PromptInt("Priority: ");
-                        double tpt = PromptDouble("Planned time (hours): ");
-                        DateTime? psd = PromptDate("Planned start (yyyy-MM-dd, blank=none): ");
-                        DateTime? ped = PromptDate("Planned end (yyyy-MM-dd, blank=none): ");
-                        int diff = PromptInt("Difficulty (0-5): ");
-                        string cat = Prompt("Category labels: ");
-                        var (ok, msg, tid) = _ctrl.CreateTask(usid, tt, td, tp, tpt, psd, ped, diff, cat);
+                        string taskTitle = Prompt("Title: ");
+                        string taskDesc = Prompt("Description: ");
+                        int taskPriority = PromptInt("Priority: ");
+                        double plannedHours = PromptDouble("Planned hours: ");
+                        DateTime? startDate = PromptDate("Planned start (yyyy-MM-dd, blank = skip): ");
+                        DateTime? endDate = PromptDate("Planned end (yyyy-MM-dd, blank = skip): ");
+                        int difficulty = PromptInt("Difficulty (0-5): ");
+                        string labels = Prompt("Labels (or blank): ");
+                        var (ok, msg, taskId) = _ctrl.CreateTask(usid, taskTitle, taskDesc, taskPriority, plannedHours, startDate, endDate, difficulty, labels);
                         Print(msg);
-                        if (ok) Print($"ID: {tid}");
+                        if (ok) Print($"Task ID: {taskId}");
                         break;
 
                     case "3":
-                        int eid = PromptInt("Task ID: ");
-                        var et = _ctrl.GetTask(eid);
-                        if (et == null) { Print("Not found."); break; }
-                        string etn = Prompt($"Title [{et.Title}]: ");
-                        if (string.IsNullOrWhiteSpace(etn)) etn = et.Title;
-                        string etd = Prompt($"Description [{et.Description}]: ");
-                        if (string.IsNullOrWhiteSpace(etd)) etd = et.Description;
-                        int epr = PromptIntDefault($"Priority [{et.Priority}]: ", et.Priority);
-                        double ept = PromptDoubleDefault($"Planned time [{et.PlannedTime}h]: ", et.PlannedTime);
-                        double eat = PromptDoubleDefault($"Actual time [{et.ActualTime}h]: ", et.ActualTime);
-                        int ediff = PromptIntDefault($"Difficulty [{et.Difficulty}]: ", et.Difficulty);
-                        string ecat = Prompt($"Labels [{et.CategoryLabels}]: ");
-                        if (string.IsNullOrWhiteSpace(ecat)) ecat = et.CategoryLabels;
-                        Print(_ctrl.EditTask(eid, etn, etd, epr, ept, eat,
-                            et.PlannedStartDate, et.PlannedEndDate,
-                            et.ActualStartDate, et.ActualEndDate,
-                            ediff, ecat).message);
+                        int editId = PromptInt("Task ID: ");
+                        var existing = _ctrl.GetTask(editId);
+                        if (existing == null) { Print("Task not found."); break; }
+
+                        string updatedTitle = Prompt($"Title [{existing.Title}]: ");
+                        if (string.IsNullOrWhiteSpace(updatedTitle)) updatedTitle = existing.Title;
+
+                        string updatedDesc = Prompt($"Description [{existing.Description}]: ");
+                        if (string.IsNullOrWhiteSpace(updatedDesc)) updatedDesc = existing.Description;
+
+                        int updatedPriority = PromptIntDefault($"Priority [{existing.Priority}]: ", existing.Priority);
+                        double updatedPlanned = PromptDoubleDefault($"Planned hours [{existing.PlannedTime}]: ", existing.PlannedTime);
+                        double updatedActual = PromptDoubleDefault($"Actual hours [{existing.ActualTime}]: ", existing.ActualTime);
+                        int updatedDifficulty = PromptIntDefault($"Difficulty [{existing.Difficulty}]: ", existing.Difficulty);
+
+                        string updatedLabels = Prompt($"Labels [{existing.CategoryLabels}]: ");
+                        if (string.IsNullOrWhiteSpace(updatedLabels)) updatedLabels = existing.CategoryLabels;
+
+                        Print(_ctrl.EditTask(editId, updatedTitle, updatedDesc, updatedPriority,
+                            updatedPlanned, updatedActual,
+                            existing.PlannedStartDate, existing.PlannedEndDate,
+                            existing.ActualStartDate, existing.ActualEndDate,
+                            updatedDifficulty, updatedLabels).message);
                         break;
 
                     case "4":
-                        int did = PromptInt("Task ID: ");
-                        Print(_ctrl.RemoveTask(did).message);
+                        int deleteId = PromptInt("Task ID: ");
+                        Print(_ctrl.RemoveTask(deleteId).message);
                         break;
 
                     case "5":
-                        int mid = PromptInt("Task ID: ");
-                        Console.WriteLine("1=ToBeDone  2=InProcess  3=Done");
-                        int stateNum = PromptInt("Target state: ");
-                        if (stateNum < 1 || stateNum > 3) { Print("Invalid."); break; }
-                        Print(_ctrl.MoveTaskToState(mid, (TaskState)stateNum).message);
+                        int moveId = PromptInt("Task ID: ");
+                        Console.WriteLine("  1 = To Be Done");
+                        Console.WriteLine("  2 = In Process");
+                        Console.WriteLine("  3 = Done");
+                        int stateChoice = PromptInt("State: ");
+                        if (stateChoice < 1 || stateChoice > 3) { Print("Invalid state."); break; }
+                        Print(_ctrl.MoveTaskToState(moveId, (TaskState)stateChoice).message);
                         break;
 
                     case "6":
-                        int atid = PromptInt("Task ID: ");
-                        int apid = PromptInt("Person ID: ");
-                        Print(_ctrl.AssignPersonToTask(atid, apid).message);
+                        int assignTaskId = PromptInt("Task ID: ");
+                        int assignPersonId = PromptInt("Person ID: ");
+                        Print(_ctrl.AssignPersonToTask(assignTaskId, assignPersonId).message);
                         break;
 
                     case "7":
-                        int rtid = PromptInt("Task ID: ");
-                        int rpid = PromptInt("Person ID: ");
-                        Print(_ctrl.RemovePersonFromTask(rtid, rpid).message);
+                        int removeTaskId = PromptInt("Task ID: ");
+                        int removePersonId = PromptInt("Person ID: ");
+                        Print(_ctrl.RemovePersonFromTask(removeTaskId, removePersonId).message);
                         break;
 
                     case "8":
-                        int cpid = PromptInt("Task ID: ");
-                        int newPri = PromptInt("New priority: ");
-                        Print(_ctrl.ChangeTaskPriority(cpid, newPri).message);
+                        int changePriorityTaskId = PromptInt("Task ID: ");
+                        int newPriority = PromptInt("New priority: ");
+                        Print(_ctrl.ChangeTaskPriority(changePriorityTaskId, newPriority).message);
                         break;
 
                     case "b": back = true; break;
@@ -401,46 +418,44 @@ namespace ScrumTool.View
                         var teams = _ctrl.ListTeams(_currentProjectId.Value);
                         if (teams.Count == 0) { Print("No teams yet."); break; }
                         foreach (var t in teams)
-                        {
-                            Console.WriteLine($"  {t}  members: {t.MemberIds.Count}");
-                        }
+                            Console.WriteLine($"  {t}  ({t.MemberIds.Count} members)");
                         break;
 
                     case "2":
-                        string name = Prompt("Team name: ");
-                        var (ok, msg, id) = _ctrl.CreateTeam(name, _currentProjectId.Value);
+                        string teamName = Prompt("Team name: ");
+                        var (ok, msg, newId) = _ctrl.CreateTeam(teamName, _currentProjectId.Value);
                         Print(msg);
-                        if (ok) Print($"ID: {id}");
+                        if (ok) Print($"Team ID: {newId}");
                         break;
 
                     case "3":
-                        int eid = PromptInt("Team ID: ");
-                        string en = Prompt("New name: ");
-                        Print(_ctrl.EditTeam(eid, en).message);
+                        int editId = PromptInt("Team ID: ");
+                        string newTeamName = Prompt("New name: ");
+                        Print(_ctrl.EditTeam(editId, newTeamName).message);
                         break;
 
                     case "4":
-                        int did = PromptInt("Team ID: ");
-                        Print(_ctrl.RemoveTeam(did).message);
+                        int deleteId = PromptInt("Team ID: ");
+                        Print(_ctrl.RemoveTeam(deleteId).message);
                         break;
 
                     case "5":
-                        int atid = PromptInt("Team ID: ");
-                        int apid = PromptInt("Person ID: ");
-                        Print(_ctrl.AddPersonToTeam(atid, apid).message);
+                        int addTeamId = PromptInt("Team ID: ");
+                        int addPersonId = PromptInt("Person ID: ");
+                        Print(_ctrl.AddPersonToTeam(addTeamId, addPersonId).message);
                         break;
 
                     case "6":
-                        int rtid = PromptInt("Team ID: ");
-                        int rpid = PromptInt("Person ID: ");
-                        Print(_ctrl.RemovePersonFromTeam(rtid, rpid).message);
+                        int removeTeamId = PromptInt("Team ID: ");
+                        int removePersonId = PromptInt("Person ID: ");
+                        Print(_ctrl.RemovePersonFromTeam(removeTeamId, removePersonId).message);
                         break;
 
                     case "7":
-                        int ltid = PromptInt("Team ID: ");
-                        var persons = _ctrl.GetPersonsForTeam(ltid);
-                        if (persons.Count == 0) { Print("No members in this team."); break; }
-                        foreach (var p in persons)
+                        int listTeamId = PromptInt("Team ID: ");
+                        var members = _ctrl.GetPersonsForTeam(listTeamId);
+                        if (members.Count == 0) { Print("No members in this team."); break; }
+                        foreach (var p in members)
                             Console.WriteLine($"  {p}");
                         break;
 
@@ -468,37 +483,37 @@ namespace ScrumTool.View
                 {
                     case "1":
                         int pid = PromptInt("Project ID: ");
-                        var pr = _ctrl.GetProjectReport(pid);
-                        if (pr == null) { Print("Not found."); break; }
-                        Console.WriteLine(pr.ToString());
+                        var projectReport = _ctrl.GetProjectReport(pid);
+                        if (projectReport == null) { Print("Not found."); break; }
+                        Console.WriteLine(projectReport.ToString());
                         break;
 
                     case "2":
-                        int spid = PromptInt("Project ID: ");
-                        var sr = _ctrl.GetSprintReport(spid);
-                        if (sr == null) { Print("Not found."); break; }
-                        Console.WriteLine(sr.ToString());
+                        int sprintPid = PromptInt("Project ID: ");
+                        var sprintReport = _ctrl.GetSprintReport(sprintPid);
+                        if (sprintReport == null) { Print("Not found."); break; }
+                        Console.WriteLine(sprintReport.ToString());
                         break;
 
                     case "3":
                         int usid = PromptInt("User Story ID: ");
-                        var usr = _ctrl.GetUserStoryReport(usid);
-                        if (usr == null) { Print("Not found."); break; }
-                        Console.WriteLine(usr.ToString());
+                        var storyReport = _ctrl.GetUserStoryReport(usid);
+                        if (storyReport == null) { Print("Not found."); break; }
+                        Console.WriteLine(storyReport.ToString());
                         break;
 
                     case "4":
                         int tid = PromptInt("Task ID: ");
-                        var tr = _ctrl.GetTaskReport(tid);
-                        if (tr == null) { Print("Not found."); break; }
-                        Console.WriteLine(tr.ToString());
+                        var taskReport = _ctrl.GetTaskReport(tid);
+                        if (taskReport == null) { Print("Not found."); break; }
+                        Console.WriteLine(taskReport.ToString());
                         break;
 
                     case "5":
-                        int perid = PromptInt("Person ID: ");
-                        var perr = _ctrl.GetPersonReport(perid);
-                        if (perr == null) { Print("Not found."); break; }
-                        Console.WriteLine(perr.ToString());
+                        int personId = PromptInt("Person ID: ");
+                        var personReport = _ctrl.GetPersonReport(personId);
+                        if (personReport == null) { Print("Not found."); break; }
+                        Console.WriteLine(personReport.ToString());
                         break;
 
                     case "b": back = true; break;
@@ -507,52 +522,52 @@ namespace ScrumTool.View
             }
         }
 
-        // helpers
+        // helpers to meet logic
 
         private bool EnsureProjectSelected()
         {
             if (_currentProjectId.HasValue) return true;
-            Print("Select a project first (Projects > option 5).");
+            Print("Select a project first."); //It will make sure user can't access options like userstories without selecting  project
             return false;
         }
 
         private void Print(string msg) => Console.WriteLine($"  >> {msg}");
 
-        private string Prompt(string msg)
+        private string Prompt(string label)
         {
-            Console.Write(msg);
+            Console.Write(label);
             return Console.ReadLine()?.Trim() ?? "";
         }
 
-        private int PromptInt(string msg)
+        private int PromptInt(string label)
         {
-            Console.Write(msg);
+            Console.Write(label);
             return int.TryParse(Console.ReadLine(), out int v) ? v : 0;
         }
 
-        private int PromptIntDefault(string msg, int def)
+        private int PromptIntDefault(string label, int fallback)
         {
-            Console.Write(msg);
+            Console.Write(label);
             string s = Console.ReadLine();
-            return string.IsNullOrWhiteSpace(s) ? def : (int.TryParse(s, out int v) ? v : def);
+            return string.IsNullOrWhiteSpace(s) ? fallback : (int.TryParse(s, out int v) ? v : fallback);
         }
 
-        private double PromptDouble(string msg)
+        private double PromptDouble(string label)
         {
-            Console.Write(msg);
+            Console.Write(label);
             return double.TryParse(Console.ReadLine(), out double v) ? v : 0;
         }
 
-        private double PromptDoubleDefault(string msg, double def)
+        private double PromptDoubleDefault(string label, double fallback)
         {
-            Console.Write(msg);
+            Console.Write(label);
             string s = Console.ReadLine();
-            return string.IsNullOrWhiteSpace(s) ? def : (double.TryParse(s, out double v) ? v : def);
+            return string.IsNullOrWhiteSpace(s) ? fallback : (double.TryParse(s, out double v) ? v : fallback);
         }
 
-        private DateTime? PromptDate(string msg)
+        private DateTime? PromptDate(string label)
         {
-            Console.Write(msg);
+            Console.Write(label);
             string s = Console.ReadLine()?.Trim();
             if (string.IsNullOrEmpty(s)) return null;
             return DateTime.TryParse(s, out DateTime d) ? d : (DateTime?)null;
