@@ -14,7 +14,8 @@ namespace ScrumTool.Controller
             _db = database ?? throw new ArgumentNullException(nameof(database));
         }
 
-        // ---- projects ----
+        // I'm adding the methods in the order of our project like 
+        // first we have projects, then persons, then user stories, then tasks, then teams and finally reports.
 
         public (bool success, string message, int id) CreateProject(string name, string description)
         {
@@ -165,10 +166,14 @@ namespace ScrumTool.Controller
             int difficulty, string categoryLabels)
         {
             var story = _db.GetUserStory(userStoryId);
-            if (story == null) return (false, "User story not found.", 0);
-            if (story.State == UserStoryState.Done) return (false, "Can't add tasks to a story that's already done.", 0);
-            if (string.IsNullOrWhiteSpace(title)) return (false, "Task title can't be empty.", 0);
-            if (plannedTime < 0) return (false, "Planned time can't be negative.", 0);
+            if (story == null)
+                return (false, "User story not found.", 0);
+            if (story.State == UserStoryState.Done)
+                return (false, "Can't add tasks to a story that's already done.", 0);
+            if (string.IsNullOrWhiteSpace(title))
+                return (false, "Task title can't be empty.", 0);
+            if (plannedTime < 0)
+                return (false, "Planned time can't be negative.", 0);
 
             int id = _db.AddTask(userStoryId, title.Trim(), description?.Trim() ?? "",
                 priority, plannedTime, plannedStart, plannedEnd, difficulty, categoryLabels?.Trim() ?? "");
@@ -182,9 +187,12 @@ namespace ScrumTool.Controller
             int difficulty, string categoryLabels)
         {
             var task = _db.GetTask(id);
-            if (task == null) return (false, "Task not found.");
-            if (string.IsNullOrWhiteSpace(title)) return (false, "Title can't be empty.");
-            if (plannedTime < 0 || actualTime < 0) return (false, "Time values can't be negative.");
+            if (task == null) 
+                return (false, "Task not found.");
+            if (string.IsNullOrWhiteSpace(title))
+                return (false, "Title can't be empty.");
+            if (plannedTime < 0 || actualTime < 0)
+                return (false, "Time values can't be negative.");
 
             _db.UpdateTask(id, title.Trim(), description?.Trim() ?? "", priority,
                 plannedTime, actualTime, plannedStart, plannedEnd, actualStart, actualEnd,
@@ -194,7 +202,8 @@ namespace ScrumTool.Controller
 
         public (bool success, string message) RemoveTask(int id)
         {
-            if (_db.GetTask(id) == null) return (false, "Task not found.");
+            if (_db.GetTask(id) == null) 
+                return (false, "Task not found.");
             _db.DeleteTask(id);
             return (true, "Task deleted.");
         }
@@ -205,10 +214,12 @@ namespace ScrumTool.Controller
         public (bool success, string message) MoveTaskToState(int taskId, TaskState targetState)
         {
             var task = _db.GetTask(taskId);
-            if (task == null) return (false, "Task not found.");
+            if (task == null)
+                return (false, "Task not found.");
 
             var story = _db.GetUserStory(task.UserStoryId);
-            if (story == null) return (false, "Couldn't find the parent user story.");
+            if (story == null) 
+                return (false, "Couldn't find the parent user story.");
 
             var depStoryTasks = new List<ScrumTask>();
             foreach (int depId in story.DependsOnIds)
@@ -224,8 +235,10 @@ namespace ScrumTool.Controller
         public (bool success, string message) AssignPersonToTask(int taskId, int personId)
         {
             var task = _db.GetTask(taskId);
-            if (task == null) return (false, "Task not found.");
-            if (_db.GetPerson(personId) == null) return (false, "Person not found.");
+            if (task == null)
+                return (false, "Task not found.");
+            if (_db.GetPerson(personId) == null)
+                return (false, "Person not found.");
 
             var story = _db.GetUserStory(task.UserStoryId);
             var projectPersons = _db.GetPersonsForProject(story.ProjectId);
@@ -238,7 +251,8 @@ namespace ScrumTool.Controller
 
         public (bool success, string message) RemovePersonFromTask(int taskId, int personId)
         {
-            if (_db.GetTask(taskId) == null) return (false, "Task not found.");
+            if (_db.GetTask(taskId) == null) 
+                return (false, "Task not found.");
             _db.RemovePersonFromTask(taskId, personId);
             return (true, "Person removed from task.");
         }
@@ -259,23 +273,28 @@ namespace ScrumTool.Controller
 
         public (bool success, string message, int id) CreateTeam(string name, int projectId)
         {
-            if (string.IsNullOrWhiteSpace(name)) return (false, "Team name can't be empty.", 0);
-            if (_db.GetProject(projectId) == null) return (false, "Project not found.", 0);
+            if (string.IsNullOrWhiteSpace(name)) 
+                return (false, "Team name can't be empty.", 0);
+            if (_db.GetProject(projectId) == null) 
+                return (false, "Project not found.", 0);
             int id = _db.AddTeam(name.Trim(), projectId);
             return (true, "Team created.", id);
         }
 
         public (bool success, string message) EditTeam(int id, string name)
         {
-            if (string.IsNullOrWhiteSpace(name)) return (false, "Team name can't be empty.");
-            if (_db.GetTeam(id) == null) return (false, "Team not found.");
+            if (string.IsNullOrWhiteSpace(name))
+                return (false, "Team name can't be empty.");
+            if (_db.GetTeam(id) == null)
+                return (false, "Team not found.");
             _db.UpdateTeam(id, name.Trim());
             return (true, "Team updated.");
         }
 
         public (bool success, string message) RemoveTeam(int id)
         {
-            if (_db.GetTeam(id) == null) return (false, "Team not found.");
+            if (_db.GetTeam(id) == null) 
+                return (false, "Team not found.");
             _db.DeleteTeam(id);
             return (true, "Team deleted.");
         }
@@ -285,8 +304,10 @@ namespace ScrumTool.Controller
         public (bool success, string message) AddPersonToTeam(int teamId, int personId)
         {
             var team = _db.GetTeam(teamId);
-            if (team == null) return (false, "Team not found.");
-            if (_db.GetPerson(personId) == null) return (false, "Person not found.");
+            if (team == null) 
+                return (false, "Team not found.");
+            if (_db.GetPerson(personId) == null) 
+                return (false, "Person not found.");
 
             var projectPersons = _db.GetPersonsForProject(team.ProjectId);
             if (!projectPersons.Exists(p => p.Id == personId))
@@ -310,9 +331,12 @@ namespace ScrumTool.Controller
         public ProjectReport GetProjectReport(int projectId)
         {
             var project = _db.GetProject(projectId);
-            if (project == null) return null;
+            if (project == null)
+                return null;
+
             var stories = _db.GetUserStoriesForProject(projectId);
             int done = stories.Count(s => s.State == UserStoryState.Done);
+
             double rate = stories.Count > 0 ? (double)done / stories.Count : 0;
             return new ProjectReport { Project = project, UserStories = stories, CompletionRate = rate };
         }
@@ -320,7 +344,8 @@ namespace ScrumTool.Controller
         public SprintReport GetSprintReport(int projectId)
         {
             var project = _db.GetProject(projectId);
-            if (project == null) return null;
+            if (project == null) 
+                return null;
 
             var sprintStories = _db.GetUserStoriesForProject(projectId)
                                    .Where(s => s.State == UserStoryState.InSprint).ToList();
@@ -351,7 +376,8 @@ namespace ScrumTool.Controller
         public UserStoryReport GetUserStoryReport(int userStoryId)
         {
             var story = _db.GetUserStory(userStoryId);
-            if (story == null) return null;
+            if (story == null) 
+                return null;
             var tasks = _db.GetTasksForUserStory(userStoryId);
 
             int done = tasks.Count(t => t.State == TaskState.Done);
@@ -375,7 +401,8 @@ namespace ScrumTool.Controller
         public TaskReport GetTaskReport(int taskId)
         {
             var task = _db.GetTask(taskId);
-            if (task == null) return null;
+            if (task == null) 
+                return null;
             return new TaskReport
             {
                 Task = task,
@@ -387,7 +414,8 @@ namespace ScrumTool.Controller
         public PersonReport GetPersonReport(int personId)
         {
             var person = _db.GetPerson(personId);
-            if (person == null) return null;
+            if (person == null) 
+                return null;
             var projects = _db.GetProjectsForPerson(personId);
             var report = new PersonReport { Person = person };
             foreach (var p in projects)

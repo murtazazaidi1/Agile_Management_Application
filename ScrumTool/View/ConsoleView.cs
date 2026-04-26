@@ -55,7 +55,7 @@ namespace ScrumTool.View
                 }
             }
 
-            Console.WriteLine("Bye!");
+            Console.WriteLine("Kiitos for using the tool, Bye!");
         }
 
         private void ShowMainMenu()

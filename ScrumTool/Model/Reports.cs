@@ -136,7 +136,7 @@ namespace ScrumTool.Model
         public override string ToString()
         {
             var sb = new System.Text.StringBuilder();
-            sb.AppendLine($"Person: {Person.Name} — {Person.Role}");
+            sb.AppendLine($"Person: {Person.Name} — {Person.Role}"); // I added stringbuilder here because it was easy and if someone wants to do it other way I'm okay with that
             foreach (var (project, tasks) in ProjectTasks)
             {
                 sb.AppendLine($"  {project.Name}");

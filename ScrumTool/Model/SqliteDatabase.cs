@@ -56,7 +56,7 @@ namespace ScrumTool.Model
             }
         }
 
-        // ---- projects ----
+        // I have added the methods here for project and whoever is working on it later please check if there are okay
 
         public int AddProject(string name, string description)
         {
@@ -113,7 +113,7 @@ namespace ScrumTool.Model
             return list;
         }
 
-        // ---- persons ----
+        // All the project methods are done and after it start the Person methods
 
         public int AddPerson(string name, string role)
         {
@@ -216,7 +216,7 @@ namespace ScrumTool.Model
             return list;
         }
 
-        // ---- user stories ----
+        // Some of the methods aren't working properly but I have added the other user story methods
 
         public int AddUserStory(int projectId, string title, string content, int priority)
         {
@@ -356,7 +356,8 @@ namespace ScrumTool.Model
             return changed;
         }
 
-        // ---- tasks ----
+        // For task methods there might be some problem because the user need to add the user story first
+        // and then add the task because of the foreign key constraint but I have added the methods for task and after it start the team methods
 
         public int AddTask(int userStoryId, string title, string description, int priority,
             double plannedTime, DateTime? plannedStartDate, DateTime? plannedEndDate,
@@ -549,7 +550,7 @@ namespace ScrumTool.Model
             return changed;
         }
 
-        // ---- teams ----
+        // These are teams methods
 
         public int AddTeam(string name, int projectId)
         {

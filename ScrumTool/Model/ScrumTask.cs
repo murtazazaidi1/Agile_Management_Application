@@ -82,7 +82,7 @@ namespace ScrumTool.Model
                 return target == TaskState.ToBeDone;
             }
 
-            // moving backward is always allowed
+            // it will make sure the task can change its state only in the right direction (ToBeDone -> InProcess -> Done)
             if ((int)target < (int)State)
                 return true;
 
